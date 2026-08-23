@@ -3,7 +3,7 @@ export type AbilityKey = "str" | "dex" | "con" | "int" | "wis" | "cha";
 export type AbilityScores = Record<AbilityKey, number>;
 
 export type RaceId = "human" | "dwarf" | "elf" | "gnome" | "half-elf" | "halfling";
-export type ClassId = "fighter" | "ranger" | "paladin" | "mage" | "cleric" | "druid" | "thief" | "bard";
+export type ClassId = "fighter" | "ranger" | "paladin" | "mage" | "illusionist" | "cleric" | "druid" | "thief" | "bard";
 
 export const ABILITIES: { id: AbilityKey; name: string; short: string }[] = [
   { id: "str", name: "Strength", short: "STR" },
@@ -26,7 +26,7 @@ export const RACES: {
     name: "Human",
     summary: "Flexible and unrestricted in class choice.",
     adjustments: {},
-    availableClasses: ["fighter", "ranger", "paladin", "mage", "cleric", "druid", "thief", "bard"],
+    availableClasses: ["fighter", "ranger", "paladin", "mage", "illusionist", "cleric", "druid", "thief", "bard"],
   },
   {
     id: "dwarf",
@@ -45,9 +45,9 @@ export const RACES: {
   {
     id: "gnome",
     name: "Gnome",
-    summary: "Clever and curious, suited to magic and subtle skills.",
+    summary: "Clever and curious, with a traditional affinity for illusion magic.",
     adjustments: { int: 1, wis: -1 },
-    availableClasses: ["fighter", "mage", "cleric", "thief"],
+    availableClasses: ["fighter", "illusionist", "cleric", "thief"],
   },
   {
     id: "half-elf",
@@ -104,7 +104,15 @@ export const CLASSES: {
     id: "mage",
     name: "Mage",
     group: "Wizard",
-    description: "A scholar of arcane magic who relies on Intelligence.",
+    description: "A generalist scholar of arcane magic who relies on Intelligence.",
+    minimums: { int: 9 },
+    exceptionalStrength: false,
+  },
+  {
+    id: "illusionist",
+    name: "Illusionist",
+    group: "Wizard",
+    description: "A specialist wizard focused on deception, perception, and phantasmal magic.",
     minimums: { int: 9 },
     exceptionalStrength: false,
   },
@@ -140,7 +148,7 @@ export const CLASSES: {
     description: "A versatile performer, traveller, and dabbler in many skills.",
     minimums: { dex: 12, int: 13, cha: 15 },
     exceptionalStrength: false,
-    allowedAlignments: ["Neutral Good", "Chaotic Good", "Lawful Neutral", "True Neutral", "Chaotic Neutral", "Neutral Evil"],
+    allowedAlignments: ["Neutral Good", "Lawful Neutral", "True Neutral", "Chaotic Neutral", "Neutral Evil"],
   },
 ];
 
