@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ABILITIES, CLASSES, RACES, type AbilityKey, type AbilityScores, type ClassId, type RaceId } from "./rules";
-import type { CharacterFinalDetails, CharacterRecord, CharacterSex, MagicRecord, PortraitForgeRecord } from "./character-record";
+import type { CharacterFinalDetails, CharacterRecord, CharacterSex, MagicRecord, PortraitForgeRecord, ClassProgressionSnapshot } from "./character-record";
 import { validateCharacterRecord } from "./character-record";
 import { deriveAllAbilities, raceTraits } from "./core-traits";
+import { hpProgression, proficiencyGains, savesFor, spellSlotsFor, thac0For, thiefBackstabMultiplier, warriorAttacksPerRound, xpFor } from "./class-progression";
 
 function num(text:string|undefined|null){const n=Number.parseFloat((text??"").replace(/[^0-9.-]/g,""));return Number.isFinite(n)?n:0;}
 function text(selector:string){return document.querySelector(selector)?.textContent?.trim()??"";}
@@ -15,6 +16,25 @@ function readSave(label:string){const rows=Array.from(document.querySelectorAll(
 function readSelectedButtons(selector:string){return Array.from(document.querySelectorAll(selector)).map(b=>b.querySelector("strong")?.textContent?.trim()??b.textContent?.trim()??"").filter(Boolean);}
 function safeJson<T>(key:string,fallback:T):T{try{return JSON.parse(localStorage.getItem(key)??"") as T}catch{return fallback;}}
 function exceptionalFromDom(){const t=text(".record-subtitle");const m=t.match(/18\/(\d{1,2}|00)/);if(!m)return null;return m[1]==="00"?100:Number.parseInt(m[1],10);}
+function progressionSnapshot(classId:ClassId):ClassProgressionSnapshot{
+ const c=CLASSES.find(item=>item.id===classId)!;
+ const level=1;
+ const gains=proficiencyGains(c.group,level);
+ return {
+  classId,
+  level,
+  xp:0,
+  nextLevelXp:xpFor(classId,2),
+  thac0:thac0For(c.group,level),
+  savingThrows:savesFor(c.group,level),
+  hpProgression:hpProgression(classId,level),
+  spellSlots:spellSlotsFor(classId,level),
+  attacksPerRound:c.group==="Warrior"?warriorAttacksPerRound(level):undefined,
+  backstabMultiplier:classId==="thief"?thiefBackstabMultiplier(level):undefined,
+  weaponBonusSlots:gains.weaponBonusSlots,
+  nonweaponBonusSlots:gains.nonweaponBonusSlots,
+ };
+}
 
 function buildRecord():Partial<CharacterRecord>{
  const race=readRace(); const classes=readClasses(); const scores=readScores();
@@ -37,6 +57,7 @@ function buildRecord():Partial<CharacterRecord>{
   identity:{name:text(".character-record h2"),sex},
   race:race??undefined,
   classes,
+  classProgression:classes.map(progressionSnapshot),
   alignment:text(".record-alignment"),
   abilities:scores,
   derivedAbilities:deriveAllAbilities(scores,exceptionalStrength,warrior),
