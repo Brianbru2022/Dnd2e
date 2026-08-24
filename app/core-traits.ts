@@ -2,22 +2,26 @@ import type { AbilityScores, RaceId } from "./rules";
 import { charismaDerived, constitutionDerived, dexterityDerived, intelligenceDerived, strengthDerived, wisdomDerived } from "./rules";
 
 export type AbilityDerivedRecord = {
-  strength: ReturnType<typeof strengthDerived>;
-  dexterity: ReturnType<typeof dexterityDerived>;
-  constitution: ReturnType<typeof constitutionDerived>;
-  intelligence: ReturnType<typeof intelligenceDerived>;
-  wisdom: ReturnType<typeof wisdomDerived>;
-  charisma: ReturnType<typeof charismaDerived>;
+  strength: Record<string, number | string>;
+  dexterity: Record<string, number | string>;
+  constitution: Record<string, number | string>;
+  intelligence: Record<string, number | string>;
+  wisdom: Record<string, number | string>;
+  charisma: Record<string, number | string>;
 };
+
+function asRecord(value: object): Record<string, number | string> {
+  return value as Record<string, number | string>;
+}
 
 export function deriveAllAbilities(scores: AbilityScores, exceptionalStrength: number | null = null): AbilityDerivedRecord {
   return {
-    strength: strengthDerived(scores.str, exceptionalStrength),
-    dexterity: dexterityDerived(scores.dex),
-    constitution: constitutionDerived(scores.con),
-    intelligence: intelligenceDerived(scores.int),
-    wisdom: wisdomDerived(scores.wis),
-    charisma: charismaDerived(scores.cha),
+    strength: asRecord(strengthDerived(scores.str, exceptionalStrength)),
+    dexterity: asRecord(dexterityDerived(scores.dex)),
+    constitution: asRecord(constitutionDerived(scores.con)),
+    intelligence: asRecord(intelligenceDerived(scores.int)),
+    wisdom: asRecord(wisdomDerived(scores.wis)),
+    charisma: asRecord(charismaDerived(scores.cha)),
   };
 }
 
