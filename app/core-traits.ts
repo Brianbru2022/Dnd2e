@@ -2,16 +2,16 @@ import type { AbilityScores, RaceId } from "./rules";
 import { charismaDerived, constitutionDerived, dexterityDerived, intelligenceDerived, strengthDerived, wisdomDerived } from "./rules";
 
 export type AbilityDerivedRecord = {
-  strength: Record<string, number | string>;
-  dexterity: Record<string, number | string>;
-  constitution: Record<string, number | string>;
-  intelligence: Record<string, number | string>;
-  wisdom: Record<string, number | string>;
-  charisma: Record<string, number | string>;
+  strength: Record<string, unknown>;
+  dexterity: Record<string, unknown>;
+  constitution: Record<string, unknown>;
+  intelligence: Record<string, unknown>;
+  wisdom: Record<string, unknown>;
+  charisma: Record<string, unknown>;
 };
 
-function asRecord(value: object): Record<string, number | string> {
-  return value as Record<string, number | string>;
+function asRecord(value: object): Record<string, unknown> {
+  return value as Record<string, unknown>;
 }
 
 export function deriveAllAbilities(scores: AbilityScores, exceptionalStrength: number | null = null): AbilityDerivedRecord {
