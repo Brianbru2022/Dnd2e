@@ -47,12 +47,12 @@ function readShield() {
   return Boolean(document.querySelector(".shield-choice.selected"));
 }
 
-function readGearIds() {
+function readGearIds(): string[] {
   const selected = Array.from(document.querySelectorAll(".equipment-choice-grid.gear button.selected"));
   return selected.map((button) => {
     const label = button.querySelector("strong")?.textContent?.trim() ?? "";
     return GENERAL_GEAR.find((item) => item.name === label)?.id ?? null;
-  }).filter((id): id is string => Boolean(id));
+  }).filter(Boolean) as string[];
 }
 
 export default function EncumbranceEngine() {
