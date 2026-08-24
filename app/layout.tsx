@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./dice.css";
 
 export const metadata: Metadata = {
   title: "Old School Character Forge",
