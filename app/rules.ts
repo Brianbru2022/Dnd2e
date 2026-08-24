@@ -1,284 +1,57 @@
 export type AbilityKey = "str" | "dex" | "con" | "int" | "wis" | "cha";
 export type AbilityScores = Record<AbilityKey, number>;
-
 export type RaceId = "human" | "dwarf" | "elf" | "gnome" | "half-elf" | "halfling";
 export type ClassId = "fighter" | "ranger" | "paladin" | "mage" | "illusionist" | "cleric" | "druid" | "thief" | "bard";
 export type ClassGroup = "Warrior" | "Wizard" | "Priest" | "Rogue";
 export type WeaponId = "longsword" | "shortsword" | "battleaxe" | "warhammer" | "mace" | "quarterstaff" | "dagger" | "spear" | "shortbow" | "longbow" | "sling";
 export type ArmorId = "none" | "leather" | "studded" | "scale" | "chain" | "splint" | "plate";
 export type ShieldId = "none" | "shield";
+export type SavingThrows = { paralyzationPoisonDeath:number; rodStaffWand:number; petrificationPolymorph:number; breathWeapon:number; spell:number };
 
-export type SavingThrows = {
-  paralyzationPoisonDeath: number;
-  rodStaffWand: number;
-  petrificationPolymorph: number;
-  breathWeapon: number;
-  spell: number;
-};
+export const ABILITIES:{id:AbilityKey;name:string;short:string}[]=[
+{id:"str",name:"Strength",short:"STR"},{id:"dex",name:"Dexterity",short:"DEX"},{id:"con",name:"Constitution",short:"CON"},{id:"int",name:"Intelligence",short:"INT"},{id:"wis",name:"Wisdom",short:"WIS"},{id:"cha",name:"Charisma",short:"CHA"}];
 
-export const ABILITIES: { id: AbilityKey; name: string; short: string }[] = [
-  { id: "str", name: "Strength", short: "STR" },
-  { id: "dex", name: "Dexterity", short: "DEX" },
-  { id: "con", name: "Constitution", short: "CON" },
-  { id: "int", name: "Intelligence", short: "INT" },
-  { id: "wis", name: "Wisdom", short: "WIS" },
-  { id: "cha", name: "Charisma", short: "CHA" },
+export const RACES:{id:RaceId;name:string;summary:string;adjustments:Partial<Record<AbilityKey,number>>;availableClasses:ClassId[];multiclass:ClassId[][]}[]=[
+{id:"human",name:"Human",summary:"Flexible and unrestricted in class choice.",adjustments:{},availableClasses:["fighter","ranger","paladin","mage","illusionist","cleric","druid","thief","bard"],multiclass:[]},
+{id:"dwarf",name:"Dwarf",summary:"Hardy and resilient, with a traditional warrior bent.",adjustments:{con:1,cha:-1},availableClasses:["fighter","cleric","thief"],multiclass:[["fighter","thief"],["fighter","cleric"]]},
+{id:"elf",name:"Elf",summary:"Agile and perceptive, with strong martial and magical traditions.",adjustments:{dex:1,con:-1},availableClasses:["fighter","ranger","mage","cleric","thief"],multiclass:[["fighter","mage"],["fighter","thief"],["mage","thief"],["fighter","mage","thief"]]},
+{id:"gnome",name:"Gnome",summary:"Clever and curious, with a traditional affinity for illusion magic.",adjustments:{int:1,wis:-1},availableClasses:["fighter","illusionist","cleric","thief"],multiclass:[["fighter","cleric"],["fighter","illusionist"],["fighter","thief"],["cleric","illusionist"],["cleric","thief"],["illusionist","thief"]]},
+{id:"half-elf",name:"Half-Elf",summary:"Adaptable, with access to a broad range of professions.",adjustments:{},availableClasses:["fighter","ranger","mage","cleric","druid","thief","bard"],multiclass:[["fighter","cleric"],["fighter","thief"],["fighter","mage"],["cleric","ranger"],["cleric","mage"],["mage","thief"],["fighter","mage","cleric"],["fighter","mage","thief"]]},
+{id:"halfling",name:"Halfling",summary:"Quick and light-footed, favouring stealth and practical combat.",adjustments:{dex:1,str:-1},availableClasses:["fighter","cleric","thief"],multiclass:[["fighter","thief"]]}
 ];
 
-export const RACES: {
-  id: RaceId;
-  name: string;
-  summary: string;
-  adjustments: Partial<Record<AbilityKey, number>>;
-  availableClasses: ClassId[];
-  multiclass: ClassId[][];
-}[] = [
-  {
-    id: "human", name: "Human", summary: "Flexible and unrestricted in class choice.", adjustments: {},
-    availableClasses: ["fighter", "ranger", "paladin", "mage", "illusionist", "cleric", "druid", "thief", "bard"], multiclass: [],
-  },
-  {
-    id: "dwarf", name: "Dwarf", summary: "Hardy and resilient, with a traditional warrior bent.", adjustments: { con: 1, cha: -1 },
-    availableClasses: ["fighter", "cleric", "thief"], multiclass: [["fighter", "cleric"], ["fighter", "thief"]],
-  },
-  {
-    id: "elf", name: "Elf", summary: "Agile and perceptive, with strong martial and magical traditions.", adjustments: { dex: 1, con: -1 },
-    availableClasses: ["fighter", "ranger", "mage", "cleric", "thief"], multiclass: [["fighter", "mage"], ["fighter", "thief"], ["mage", "thief"], ["fighter", "mage", "thief"]],
-  },
-  {
-    id: "gnome", name: "Gnome", summary: "Clever and curious, with a traditional affinity for illusion magic.", adjustments: { int: 1, wis: -1 },
-    availableClasses: ["fighter", "illusionist", "cleric", "thief"], multiclass: [["fighter", "illusionist"], ["fighter", "thief"], ["illusionist", "thief"]],
-  },
-  {
-    id: "half-elf", name: "Half-Elf", summary: "Adaptable, with access to a broad range of professions.", adjustments: {},
-    availableClasses: ["fighter", "ranger", "mage", "cleric", "druid", "thief", "bard"],
-    multiclass: [["fighter", "mage"], ["fighter", "cleric"], ["fighter", "thief"], ["mage", "cleric"], ["mage", "thief"], ["cleric", "ranger"], ["fighter", "mage", "cleric"], ["fighter", "mage", "thief"]],
-  },
-  {
-    id: "halfling", name: "Halfling", summary: "Quick and light-footed, favouring stealth and practical combat.", adjustments: { dex: 1, str: -1 },
-    availableClasses: ["fighter", "cleric", "thief"], multiclass: [["fighter", "thief"]],
-  },
+export const CLASSES:{id:ClassId;name:string;group:ClassGroup;description:string;minimums:Partial<Record<AbilityKey,number>>;exceptionalStrength:boolean;allowedAlignments?:string[];hitDie:number;weaponSlots:number;nonWeaponSlots:number;allowedWeapons:WeaponId[];allowedArmor:ArmorId[];shield:boolean}[]=[
+{id:"fighter",name:"Fighter",group:"Warrior",description:"A dedicated combatant with broad weapon and armour access.",minimums:{str:9},exceptionalStrength:true,hitDie:10,weaponSlots:4,nonWeaponSlots:3,allowedWeapons:["longsword","shortsword","battleaxe","warhammer","mace","quarterstaff","dagger","spear","shortbow","longbow","sling"],allowedArmor:["none","leather","studded","scale","chain","splint","plate"],shield:true},
+{id:"ranger",name:"Ranger",group:"Warrior",description:"A wilderness warrior requiring exceptional physical and spiritual aptitude.",minimums:{str:13,dex:13,con:14,wis:14},exceptionalStrength:true,allowedAlignments:["Lawful Good","Neutral Good","Chaotic Good"],hitDie:10,weaponSlots:4,nonWeaponSlots:3,allowedWeapons:["longsword","shortsword","battleaxe","warhammer","mace","quarterstaff","dagger","spear","shortbow","longbow","sling"],allowedArmor:["none","leather","studded","scale","chain"],shield:true},
+{id:"paladin",name:"Paladin",group:"Warrior",description:"A highly demanding holy warrior vocation.",minimums:{str:12,con:9,wis:13,cha:17},exceptionalStrength:true,allowedAlignments:["Lawful Good"],hitDie:10,weaponSlots:4,nonWeaponSlots:3,allowedWeapons:["longsword","shortsword","battleaxe","warhammer","mace","quarterstaff","dagger","spear","shortbow","longbow","sling"],allowedArmor:["none","leather","studded","scale","chain","splint","plate"],shield:true},
+{id:"mage",name:"Mage",group:"Wizard",description:"A generalist scholar of arcane magic who relies on Intelligence.",minimums:{int:9},exceptionalStrength:false,hitDie:4,weaponSlots:1,nonWeaponSlots:4,allowedWeapons:["quarterstaff","dagger"],allowedArmor:["none"],shield:false},
+{id:"illusionist",name:"Illusionist",group:"Wizard",description:"A specialist wizard focused on deception, perception, and phantasmal magic.",minimums:{int:9,dex:16},exceptionalStrength:false,hitDie:4,weaponSlots:1,nonWeaponSlots:4,allowedWeapons:["quarterstaff","dagger"],allowedArmor:["none"],shield:false},
+{id:"cleric",name:"Cleric",group:"Priest",description:"A priestly adventurer whose powers are rooted in Wisdom.",minimums:{wis:9},exceptionalStrength:false,hitDie:8,weaponSlots:2,nonWeaponSlots:4,allowedWeapons:["warhammer","mace","quarterstaff","sling"],allowedArmor:["none","leather","studded","scale","chain","splint","plate"],shield:true},
+{id:"druid",name:"Druid",group:"Priest",description:"A guardian of the natural order with demanding spiritual requirements.",minimums:{wis:12,cha:15},exceptionalStrength:false,allowedAlignments:["True Neutral"],hitDie:8,weaponSlots:2,nonWeaponSlots:4,allowedWeapons:["quarterstaff","dagger","spear","sling"],allowedArmor:["none","leather"],shield:true},
+{id:"thief",name:"Thief",group:"Rogue",description:"A specialist in stealth, locks, traps, and opportunistic combat.",minimums:{dex:9},exceptionalStrength:false,hitDie:6,weaponSlots:2,nonWeaponSlots:3,allowedWeapons:["longsword","shortsword","quarterstaff","dagger","shortbow","sling"],allowedArmor:["none","leather","studded"],shield:false},
+{id:"bard",name:"Bard",group:"Rogue",description:"A versatile performer, traveller, and dabbler in many skills.",minimums:{dex:12,int:13,cha:15},exceptionalStrength:false,allowedAlignments:["Neutral Good","Lawful Neutral","True Neutral","Chaotic Neutral","Neutral Evil"],hitDie:6,weaponSlots:2,nonWeaponSlots:3,allowedWeapons:["longsword","shortsword","quarterstaff","dagger","spear","shortbow","sling"],allowedArmor:["none","leather","studded","chain"],shield:false}
 ];
 
-export const CLASSES: {
-  id: ClassId;
-  name: string;
-  group: ClassGroup;
-  description: string;
-  minimums: Partial<Record<AbilityKey, number>>;
-  exceptionalStrength: boolean;
-  allowedAlignments?: string[];
-  hitDie: number;
-  weaponSlots: number;
-  nonWeaponSlots: number;
-  allowedWeapons: WeaponId[];
-  allowedArmor: ArmorId[];
-  shield: boolean;
-}[] = [
-  { id: "fighter", name: "Fighter", group: "Warrior", description: "A dedicated combatant with broad weapon and armour access.", minimums: { str: 9 }, exceptionalStrength: true, hitDie: 10, weaponSlots: 4, nonWeaponSlots: 3, allowedWeapons: ["longsword","shortsword","battleaxe","warhammer","mace","quarterstaff","dagger","spear","shortbow","longbow","sling"], allowedArmor: ["none","leather","studded","scale","chain","splint","plate"], shield: true },
-  { id: "ranger", name: "Ranger", group: "Warrior", description: "A wilderness warrior requiring exceptional physical and spiritual aptitude.", minimums: { str: 13, dex: 13, con: 14, wis: 14 }, exceptionalStrength: true, allowedAlignments: ["Lawful Good","Neutral Good","Chaotic Good"], hitDie: 10, weaponSlots: 4, nonWeaponSlots: 3, allowedWeapons: ["longsword","shortsword","battleaxe","warhammer","mace","quarterstaff","dagger","spear","shortbow","longbow","sling"], allowedArmor: ["none","leather","studded","scale","chain"], shield: true },
-  { id: "paladin", name: "Paladin", group: "Warrior", description: "A highly demanding holy warrior vocation.", minimums: { str: 12, con: 9, wis: 13, cha: 17 }, exceptionalStrength: true, allowedAlignments: ["Lawful Good"], hitDie: 10, weaponSlots: 4, nonWeaponSlots: 3, allowedWeapons: ["longsword","shortsword","battleaxe","warhammer","mace","quarterstaff","dagger","spear","shortbow","longbow","sling"], allowedArmor: ["none","leather","studded","scale","chain","splint","plate"], shield: true },
-  { id: "mage", name: "Mage", group: "Wizard", description: "A generalist scholar of arcane magic who relies on Intelligence.", minimums: { int: 9 }, exceptionalStrength: false, hitDie: 4, weaponSlots: 1, nonWeaponSlots: 4, allowedWeapons: ["quarterstaff","dagger"], allowedArmor: ["none"], shield: false },
-  { id: "illusionist", name: "Illusionist", group: "Wizard", description: "A specialist wizard focused on deception, perception, and phantasmal magic.", minimums: { int: 9 }, exceptionalStrength: false, hitDie: 4, weaponSlots: 1, nonWeaponSlots: 4, allowedWeapons: ["quarterstaff","dagger"], allowedArmor: ["none"], shield: false },
-  { id: "cleric", name: "Cleric", group: "Priest", description: "A priestly adventurer whose powers are rooted in Wisdom.", minimums: { wis: 9 }, exceptionalStrength: false, hitDie: 8, weaponSlots: 2, nonWeaponSlots: 4, allowedWeapons: ["warhammer","mace","quarterstaff","sling"], allowedArmor: ["none","leather","studded","scale","chain","splint","plate"], shield: true },
-  { id: "druid", name: "Druid", group: "Priest", description: "A guardian of the natural order with demanding spiritual requirements.", minimums: { wis: 12, cha: 15 }, exceptionalStrength: false, allowedAlignments: ["True Neutral"], hitDie: 8, weaponSlots: 2, nonWeaponSlots: 4, allowedWeapons: ["quarterstaff","dagger","spear","sling"], allowedArmor: ["none","leather"], shield: true },
-  { id: "thief", name: "Thief", group: "Rogue", description: "A specialist in stealth, locks, traps, and opportunistic combat.", minimums: { dex: 9 }, exceptionalStrength: false, hitDie: 6, weaponSlots: 2, nonWeaponSlots: 3, allowedWeapons: ["longsword","shortsword","quarterstaff","dagger","shortbow","sling"], allowedArmor: ["none","leather","studded"], shield: false },
-  { id: "bard", name: "Bard", group: "Rogue", description: "A versatile performer, traveller, and dabbler in many skills.", minimums: { dex: 12, int: 13, cha: 15 }, exceptionalStrength: false, allowedAlignments: ["Neutral Good","Lawful Neutral","True Neutral","Chaotic Neutral","Neutral Evil"], hitDie: 6, weaponSlots: 2, nonWeaponSlots: 3, allowedWeapons: ["longsword","shortsword","quarterstaff","dagger","spear","shortbow","sling"], allowedArmor: ["none","leather","studded","chain"], shield: false },
-];
-
-export const ALIGNMENTS = ["Lawful Good","Neutral Good","Chaotic Good","Lawful Neutral","True Neutral","Chaotic Neutral","Lawful Evil","Neutral Evil","Chaotic Evil"] as const;
-
-export const WEAPONS: { id: WeaponId; name: string; cost: number; damage: string }[] = [
-  { id: "longsword", name: "Long sword", cost: 15, damage: "1d8" },
-  { id: "shortsword", name: "Short sword", cost: 10, damage: "1d6" },
-  { id: "battleaxe", name: "Battle axe", cost: 5, damage: "1d8" },
-  { id: "warhammer", name: "Warhammer", cost: 2, damage: "1d4+1" },
-  { id: "mace", name: "Mace", cost: 8, damage: "1d6+1" },
-  { id: "quarterstaff", name: "Quarterstaff", cost: 0, damage: "1d6" },
-  { id: "dagger", name: "Dagger", cost: 2, damage: "1d4" },
-  { id: "spear", name: "Spear", cost: 1, damage: "1d6" },
-  { id: "shortbow", name: "Short bow", cost: 30, damage: "1d6" },
-  { id: "longbow", name: "Long bow", cost: 75, damage: "1d6" },
-  { id: "sling", name: "Sling", cost: 0, damage: "1d4+1" },
-];
-
-export const ARMOR: { id: ArmorId; name: string; ac: number; cost: number }[] = [
-  { id: "none", name: "No armour", ac: 10, cost: 0 },
-  { id: "leather", name: "Leather", ac: 8, cost: 5 },
-  { id: "studded", name: "Studded leather", ac: 7, cost: 20 },
-  { id: "scale", name: "Scale mail", ac: 6, cost: 120 },
-  { id: "chain", name: "Chain mail", ac: 5, cost: 75 },
-  { id: "splint", name: "Splint mail", ac: 4, cost: 80 },
-  { id: "plate", name: "Plate mail", ac: 3, cost: 600 },
-];
-
-export const GENERAL_GEAR = [
-  { id: "backpack", name: "Backpack", cost: 2 },
-  { id: "bedroll", name: "Bedroll", cost: 0.2 },
-  { id: "rope", name: "50 ft rope", cost: 1 },
-  { id: "lantern", name: "Lantern", cost: 7 },
-  { id: "oil", name: "Oil flask", cost: 0.1 },
-  { id: "rations", name: "Trail rations (1 week)", cost: 10 },
-  { id: "waterskin", name: "Waterskin", cost: 0.8 },
-] as const;
-
-export const NON_WEAPON_PROFICIENCIES = ["Ancient History","Animal Handling","Direction Sense","Endurance","Healing","Herbalism","Local History","Navigation","Reading/Writing","Riding","Survival","Swimming"] as const;
-
-export const EMPTY_SCORES: AbilityScores = { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 };
-
-const LEVEL_ONE_SAVES: Record<ClassGroup, SavingThrows> = {
-  Warrior: { paralyzationPoisonDeath: 14, rodStaffWand: 16, petrificationPolymorph: 15, breathWeapon: 17, spell: 17 },
-  Wizard: { paralyzationPoisonDeath: 14, rodStaffWand: 11, petrificationPolymorph: 13, breathWeapon: 15, spell: 12 },
-  Priest: { paralyzationPoisonDeath: 10, rodStaffWand: 14, petrificationPolymorph: 13, breathWeapon: 16, spell: 15 },
-  Rogue: { paralyzationPoisonDeath: 13, rodStaffWand: 14, petrificationPolymorph: 12, breathWeapon: 16, spell: 15 },
-};
-
-function racialConSaveBonus(score: number) {
-  if (score <= 3) return 0;
-  if (score <= 6) return 1;
-  if (score <= 10) return 2;
-  if (score <= 13) return 3;
-  if (score <= 17) return 4;
-  return 5;
-}
-
-function poisonAbilityAdjustment(score: number) {
-  if (score <= 1) return -2;
-  if (score === 2) return -1;
-  if (score >= 23) return 3;
-  if (score >= 21) return 2;
-  if (score >= 19) return 1;
-  return 0;
-}
-
-export function applyRaceAdjustments(scores: AbilityScores, raceId: RaceId): AbilityScores {
-  const race = RACES.find((item) => item.id === raceId);
-  const next = { ...scores };
-  if (!race) return next;
-  for (const ability of ABILITIES) next[ability.id] = Math.max(3, Math.min(19, next[ability.id] + (race.adjustments[ability.id] ?? 0)));
-  return next;
-}
-
-export function qualifiesForClass(scores: AbilityScores, classId: ClassId) {
-  const characterClass = CLASSES.find((item) => item.id === classId);
-  if (!characterClass) return false;
-  return Object.entries(characterClass.minimums).every(([key, value]) => scores[key as AbilityKey] >= (value ?? 0));
-}
-
-export function constitutionHpBonus(score: number, warrior: boolean) {
-  if (score <= 3) return -2;
-  if (score <= 6) return -1;
-  if (score <= 14) return 0;
-  if (score === 15) return 1;
-  if (score === 16) return 2;
-  if (!warrior) return 2;
-  if (score === 17) return 3;
-  if (score === 18) return 4;
-  return 5;
-}
-
-export function dexterityAcAdjustment(score: number) {
-  if (score <= 3) return 4;
-  if (score === 4) return 3;
-  if (score === 5) return 2;
-  if (score === 6) return 1;
-  if (score <= 14) return 0;
-  if (score === 15) return -1;
-  if (score === 16) return -2;
-  if (score === 17) return -3;
-  return -4;
-}
-
-export function strengthDerived(score: number, exceptional: number | null = null) {
-  if (score <= 2) return score === 1 ? { hit: -5, damage: -4, weight: 1, press: 3, doors: "1", bend: "0%" } : { hit: -3, damage: -2, weight: 1, press: 5, doors: "1", bend: "0%" };
-  if (score === 3) return { hit: -3, damage: -1, weight: 5, press: 10, doors: "2", bend: "0%" };
-  if (score <= 5) return { hit: -2, damage: -1, weight: 10, press: 25, doors: "3", bend: "0%" };
-  if (score <= 7) return { hit: -1, damage: 0, weight: 20, press: 55, doors: "4", bend: "0%" };
-  if (score <= 9) return { hit: 0, damage: 0, weight: 35, press: 90, doors: "5", bend: "1%" };
-  if (score <= 11) return { hit: 0, damage: 0, weight: 40, press: 115, doors: "6", bend: "2%" };
-  if (score <= 13) return { hit: 0, damage: 0, weight: 45, press: 140, doors: "7", bend: "4%" };
-  if (score <= 15) return { hit: 0, damage: 0, weight: 55, press: 170, doors: "8", bend: "7%" };
-  if (score === 16) return { hit: 0, damage: 1, weight: 70, press: 195, doors: "9", bend: "10%" };
-  if (score === 17) return { hit: 1, damage: 1, weight: 85, press: 220, doors: "10", bend: "13%" };
-  if (score === 18 && exceptional !== null) {
-    if (exceptional <= 50) return { hit: 1, damage: 3, weight: 135, press: 280, doors: "12", bend: "20%" };
-    if (exceptional <= 75) return { hit: 2, damage: 3, weight: 160, press: 305, doors: "13", bend: "25%" };
-    if (exceptional <= 90) return { hit: 2, damage: 4, weight: 185, press: 330, doors: "14", bend: "30%" };
-    if (exceptional <= 99) return { hit: 2, damage: 5, weight: 235, press: 380, doors: "15 (3)", bend: "35%" };
-    return { hit: 3, damage: 6, weight: 335, press: 480, doors: "16 (6)", bend: "40%" };
-  }
-  if (score === 18) return { hit: 1, damage: 2, weight: 110, press: 255, doors: "11", bend: "16%" };
-  return { hit: 3, damage: 7, weight: 485, press: 640, doors: "16 (8)", bend: "50%" };
-}
-
-export function dexterityDerived(score: number) {
-  const reaction = score <= 1 ? -6 : score === 2 ? -4 : score === 3 ? -3 : score === 4 ? -2 : score === 5 ? -1 : score <= 15 ? 0 : score === 16 ? 1 : score <= 18 ? 2 : 3;
-  const missile = reaction;
-  return { reaction, missile, defense: dexterityAcAdjustment(score) };
-}
-
-export function constitutionDerived(score: number, warrior: boolean) {
-  const shocks = [0,25,30,35,40,45,50,55,60,65,70,75,80,85,88,90,95,97,99,99];
-  const resurrection = [0,30,35,40,45,50,55,60,65,70,75,80,85,90,92,94,96,98,100,100];
-  const index = Math.max(1, Math.min(19, score));
-  return { hp: constitutionHpBonus(score, warrior), systemShock: shocks[index], resurrection: resurrection[index], poison: poisonAbilityAdjustment(score) };
-}
-
-export function intelligenceDerived(score: number) {
-  const rows: Record<number, { languages: number; maxSpell: string; learn: string; maxSpells: string }> = {
-    9:{languages:2,maxSpell:"4th",learn:"35%",maxSpells:"6"},10:{languages:2,maxSpell:"5th",learn:"40%",maxSpells:"7"},11:{languages:2,maxSpell:"5th",learn:"45%",maxSpells:"7"},12:{languages:3,maxSpell:"6th",learn:"50%",maxSpells:"7"},13:{languages:3,maxSpell:"6th",learn:"55%",maxSpells:"9"},14:{languages:4,maxSpell:"7th",learn:"60%",maxSpells:"9"},15:{languages:4,maxSpell:"7th",learn:"65%",maxSpells:"11"},16:{languages:5,maxSpell:"8th",learn:"70%",maxSpells:"11"},17:{languages:6,maxSpell:"8th",learn:"75%",maxSpells:"14"},18:{languages:7,maxSpell:"9th",learn:"85%",maxSpells:"18"},19:{languages:8,maxSpell:"9th",learn:"95%",maxSpells:"All"},
-  };
-  if (score < 9) return { languages: score <= 1 ? 0 : 1, maxSpell: "—", learn: "—", maxSpells: "—" };
-  return rows[Math.min(19, score)] ?? rows[19];
-}
-
-export function wisdomDerived(score: number) {
-  const magicDefense = score <= 1 ? -6 : score === 2 ? -4 : score === 3 ? -3 : score === 4 ? -2 : score <= 7 ? -1 : score <= 14 ? 0 : score === 15 ? 1 : score === 16 ? 2 : score === 17 ? 3 : score === 18 ? 4 : 4;
-  const failure = score <= 1 ? 80 : score === 2 ? 60 : score === 3 ? 50 : score === 4 ? 45 : score === 5 ? 40 : score === 6 ? 35 : score === 7 ? 30 : score === 8 ? 25 : score === 9 ? 20 : score === 10 ? 15 : score === 11 ? 10 : score === 12 ? 5 : 0;
-  const bonusSpells = score < 13 ? "—" : score === 13 ? "1×1st" : score === 14 ? "2×1st" : score === 15 ? "2×1st, 1×2nd" : score === 16 ? "2×1st, 2×2nd" : score === 17 ? "2×1st, 2×2nd, 1×3rd" : "2×1st, 2×2nd, 1×3rd, 1×4th";
-  return { magicDefense, spellFailure: `${failure}%`, bonusSpells };
-}
-
-export function charismaDerived(score: number) {
-  const rows: Record<number, { henchmen: number; loyalty: number; reaction: number }> = {
-    1:{henchmen:0,loyalty:-8,reaction:-7},2:{henchmen:1,loyalty:-7,reaction:-6},3:{henchmen:1,loyalty:-6,reaction:-5},4:{henchmen:1,loyalty:-5,reaction:-4},5:{henchmen:2,loyalty:-4,reaction:-3},6:{henchmen:2,loyalty:-3,reaction:-2},7:{henchmen:3,loyalty:-2,reaction:-1},8:{henchmen:3,loyalty:-1,reaction:0},9:{henchmen:4,loyalty:0,reaction:0},10:{henchmen:4,loyalty:0,reaction:0},11:{henchmen:4,loyalty:0,reaction:0},12:{henchmen:5,loyalty:0,reaction:0},13:{henchmen:5,loyalty:0,reaction:1},14:{henchmen:6,loyalty:1,reaction:2},15:{henchmen:7,loyalty:3,reaction:3},16:{henchmen:8,loyalty:4,reaction:5},17:{henchmen:10,loyalty:6,reaction:6},18:{henchmen:15,loyalty:8,reaction:7},19:{henchmen:20,loyalty:10,reaction:8},
-  };
-  return rows[Math.max(1, Math.min(19, score))];
-}
-
-export function levelOneSavingThrows(classIds: ClassId[], raceId: RaceId | null, constitution: number): SavingThrows | null {
-  if (!classIds.length) return null;
-  const groups = classIds.map((id) => classById(id).group);
-  const saves = groups.reduce<SavingThrows>((best, group) => {
-    const row = LEVEL_ONE_SAVES[group];
-    return {
-      paralyzationPoisonDeath: Math.min(best.paralyzationPoisonDeath, row.paralyzationPoisonDeath),
-      rodStaffWand: Math.min(best.rodStaffWand, row.rodStaffWand),
-      petrificationPolymorph: Math.min(best.petrificationPolymorph, row.petrificationPolymorph),
-      breathWeapon: Math.min(best.breathWeapon, row.breathWeapon),
-      spell: Math.min(best.spell, row.spell),
-    };
-  }, { paralyzationPoisonDeath: 99, rodStaffWand: 99, petrificationPolymorph: 99, breathWeapon: 99, spell: 99 });
-
-  const raceBonus = racialConSaveBonus(constitution);
-  const magicRace = raceId === "dwarf" || raceId === "gnome" || raceId === "halfling";
-  const poisonRace = raceId === "dwarf" || raceId === "halfling";
-  const poisonAdj = poisonAbilityAdjustment(constitution);
-  return {
-    paralyzationPoisonDeath: Math.max(2, saves.paralyzationPoisonDeath - (poisonRace ? raceBonus : 0) - poisonAdj),
-    rodStaffWand: Math.max(2, saves.rodStaffWand - (magicRace ? raceBonus : 0)),
-    petrificationPolymorph: saves.petrificationPolymorph,
-    breathWeapon: saves.breathWeapon,
-    spell: Math.max(2, saves.spell - (magicRace ? raceBonus : 0)),
-  };
-}
-
-export function startingGoldDice(group: ClassGroup) {
-  if (group === "Warrior") return { count: 5, sides: 4, multiplier: 10, bonus: 0 };
-  if (group === "Wizard") return { count: 1, sides: 4, multiplier: 10, bonus: 1 };
-  if (group === "Priest") return { count: 3, sides: 6, multiplier: 10, bonus: 0 };
-  return { count: 2, sides: 6, multiplier: 10, bonus: 0 };
-}
-
-export function classById(id: ClassId) { return CLASSES.find((item) => item.id === id)!; }
-export function raceById(id: RaceId) { return RACES.find((item) => item.id === id)!; }
+export const ALIGNMENTS=["Lawful Good","Neutral Good","Chaotic Good","Lawful Neutral","True Neutral","Chaotic Neutral","Lawful Evil","Neutral Evil","Chaotic Evil"] as const;
+export const WEAPONS:{id:WeaponId;name:string;cost:number;damage:string}[]=[
+{id:"longsword",name:"Long sword",cost:15,damage:"1d8"},{id:"shortsword",name:"Short sword",cost:10,damage:"1d6"},{id:"battleaxe",name:"Battle axe",cost:5,damage:"1d8"},{id:"warhammer",name:"Warhammer",cost:2,damage:"1d4+1"},{id:"mace",name:"Mace",cost:8,damage:"1d6+1"},{id:"quarterstaff",name:"Quarterstaff",cost:0,damage:"1d6"},{id:"dagger",name:"Dagger",cost:2,damage:"1d4"},{id:"spear",name:"Spear",cost:1,damage:"1d6"},{id:"shortbow",name:"Short bow",cost:30,damage:"1d6"},{id:"longbow",name:"Long bow",cost:75,damage:"1d6"},{id:"sling",name:"Sling",cost:0,damage:"1d4+1"}];
+export const ARMOR:{id:ArmorId;name:string;ac:number;cost:number}[]=[{id:"none",name:"No armour",ac:10,cost:0},{id:"leather",name:"Leather",ac:8,cost:5},{id:"studded",name:"Studded leather",ac:7,cost:20},{id:"scale",name:"Scale mail",ac:6,cost:120},{id:"chain",name:"Chain mail",ac:5,cost:75},{id:"splint",name:"Splint mail",ac:4,cost:80},{id:"plate",name:"Plate mail",ac:3,cost:600}];
+export const GENERAL_GEAR=[{id:"backpack",name:"Backpack",cost:2},{id:"bedroll",name:"Bedroll",cost:.2},{id:"rope",name:"50 ft rope",cost:1},{id:"lantern",name:"Lantern",cost:7},{id:"oil",name:"Oil flask",cost:.1},{id:"rations",name:"Trail rations (1 week)",cost:10},{id:"waterskin",name:"Waterskin",cost:.8}] as const;
+export const NON_WEAPON_PROFICIENCIES=["Ancient History","Animal Handling","Direction Sense","Endurance","Healing","Herbalism","Local History","Navigation","Reading/Writing","Riding","Survival","Swimming"] as const;
+export const EMPTY_SCORES:AbilityScores={str:0,dex:0,con:0,int:0,wis:0,cha:0};
+const LEVEL_ONE_SAVES:Record<ClassGroup,SavingThrows>={Warrior:{paralyzationPoisonDeath:14,rodStaffWand:16,petrificationPolymorph:15,breathWeapon:17,spell:17},Wizard:{paralyzationPoisonDeath:14,rodStaffWand:11,petrificationPolymorph:13,breathWeapon:15,spell:12},Priest:{paralyzationPoisonDeath:10,rodStaffWand:14,petrificationPolymorph:13,breathWeapon:16,spell:15},Rogue:{paralyzationPoisonDeath:13,rodStaffWand:14,petrificationPolymorph:12,breathWeapon:16,spell:15}};
+function racialConSaveBonus(score:number){if(score<=3)return 0;if(score<=6)return 1;if(score<=10)return 2;if(score<=13)return 3;if(score<=17)return 4;return 5;}
+function poisonAbilityAdjustment(score:number){if(score<=1)return-2;if(score===2)return-1;if(score>=23)return 3;if(score>=21)return 2;if(score>=19)return 1;return 0;}
+export function applyRaceAdjustments(scores:AbilityScores,raceId:RaceId):AbilityScores{const race=RACES.find(i=>i.id===raceId);const next={...scores};if(!race)return next;for(const ability of ABILITIES)next[ability.id]=Math.max(3,Math.min(19,next[ability.id]+(race.adjustments[ability.id]??0)));return next;}
+export function qualifiesForClass(scores:AbilityScores,classId:ClassId){const c=CLASSES.find(i=>i.id===classId);return !!c&&Object.entries(c.minimums).every(([key,value])=>scores[key as AbilityKey]>=(value??0));}
+export function constitutionHpBonus(score:number,warrior:boolean){if(score<=3)return-2;if(score<=6)return-1;if(score<=14)return 0;if(score===15)return 1;if(score===16)return 2;if(!warrior)return 2;if(score===17)return 3;if(score===18)return 4;return 5;}
+export function dexterityAcAdjustment(score:number){if(score<=3)return 4;if(score===4)return 3;if(score===5)return 2;if(score===6)return 1;if(score<=14)return 0;if(score===15)return-1;if(score===16)return-2;if(score===17)return-3;return-4;}
+export function strengthDerived(score:number,exceptional:number|null=null){if(score<=2)return score===1?{hit:-5,damage:-4,weight:1,press:3,doors:"1",bend:"0%"}:{hit:-3,damage:-2,weight:1,press:5,doors:"1",bend:"0%"};if(score===3)return{hit:-3,damage:-1,weight:5,press:10,doors:"2",bend:"0%"};if(score<=5)return{hit:-2,damage:-1,weight:10,press:25,doors:"3",bend:"0%"};if(score<=7)return{hit:-1,damage:0,weight:20,press:55,doors:"4",bend:"0%"};if(score<=9)return{hit:0,damage:0,weight:35,press:90,doors:"5",bend:"1%"};if(score<=11)return{hit:0,damage:0,weight:40,press:115,doors:"6",bend:"2%"};if(score<=13)return{hit:0,damage:0,weight:45,press:140,doors:"7",bend:"4%"};if(score<=15)return{hit:0,damage:0,weight:55,press:170,doors:"8",bend:"7%"};if(score===16)return{hit:0,damage:1,weight:70,press:195,doors:"9",bend:"10%"};if(score===17)return{hit:1,damage:1,weight:85,press:220,doors:"10",bend:"13%"};if(score===18&&exceptional!==null){if(exceptional<=50)return{hit:1,damage:3,weight:135,press:280,doors:"12",bend:"20%"};if(exceptional<=75)return{hit:2,damage:3,weight:160,press:305,doors:"13",bend:"25%"};if(exceptional<=90)return{hit:2,damage:4,weight:185,press:330,doors:"14",bend:"30%"};if(exceptional<=99)return{hit:2,damage:5,weight:235,press:380,doors:"15 (3)",bend:"35%"};return{hit:3,damage:6,weight:335,press:480,doors:"16 (6)",bend:"40%"};}if(score===18)return{hit:1,damage:2,weight:110,press:255,doors:"11",bend:"16%"};return{hit:3,damage:7,weight:485,press:640,doors:"16 (8)",bend:"50%"};}
+export function dexterityDerived(score:number){const reaction=score<=1?-6:score===2?-4:score===3?-3:score===4?-2:score===5?-1:score<=15?0:score===16?1:score<=18?2:3;return{reaction,missile:reaction,defense:dexterityAcAdjustment(score)};}
+export function constitutionDerived(score:number,warrior:boolean){const shocks=[0,25,30,35,40,45,50,55,60,65,70,75,80,85,88,90,95,97,99,99];const resurrection=[0,30,35,40,45,50,55,60,65,70,75,80,85,90,92,94,96,98,100,100];const index=Math.max(1,Math.min(19,score));return{hp:constitutionHpBonus(score,warrior),systemShock:shocks[index],resurrection:resurrection[index],poison:poisonAbilityAdjustment(score)};}
+export function intelligenceDerived(score:number){const rows:Record<number,{languages:number;maxSpell:string;learn:string;maxSpells:string}>={9:{languages:2,maxSpell:"4th",learn:"35%",maxSpells:"6"},10:{languages:2,maxSpell:"5th",learn:"40%",maxSpells:"7"},11:{languages:2,maxSpell:"5th",learn:"45%",maxSpells:"7"},12:{languages:3,maxSpell:"6th",learn:"50%",maxSpells:"7"},13:{languages:3,maxSpell:"6th",learn:"55%",maxSpells:"9"},14:{languages:4,maxSpell:"7th",learn:"60%",maxSpells:"9"},15:{languages:4,maxSpell:"7th",learn:"65%",maxSpells:"11"},16:{languages:5,maxSpell:"8th",learn:"70%",maxSpells:"11"},17:{languages:6,maxSpell:"8th",learn:"75%",maxSpells:"14"},18:{languages:7,maxSpell:"9th",learn:"85%",maxSpells:"18"},19:{languages:8,maxSpell:"9th",learn:"95%",maxSpells:"All"}};if(score<9)return{languages:score<=1?0:1,maxSpell:"—",learn:"—",maxSpells:"—"};return rows[Math.min(19,score)]??rows[19];}
+export function wisdomDerived(score:number){const magicDefense=score<=1?-6:score===2?-4:score===3?-3:score===4?-2:score<=7?-1:score<=14?0:score===15?1:score===16?2:score===17?3:4;const failure=score<=1?80:score===2?60:score===3?50:score===4?45:score===5?40:score===6?35:score===7?30:score===8?25:score===9?20:score===10?15:score===11?10:score===12?5:0;const bonusSpells=score<13?"—":score===13?"1×1st":score===14?"2×1st":score===15?"2×1st, 1×2nd":score===16?"2×1st, 2×2nd":score===17?"2×1st, 2×2nd, 1×3rd":"2×1st, 2×2nd, 1×3rd, 1×4th";return{magicDefense,spellFailure:`${failure}%`,bonusSpells};}
+export function charismaDerived(score:number){const rows:Record<number,{henchmen:number;loyalty:number;reaction:number}>={1:{henchmen:0,loyalty:-8,reaction:-7},2:{henchmen:1,loyalty:-7,reaction:-6},3:{henchmen:1,loyalty:-6,reaction:-5},4:{henchmen:1,loyalty:-5,reaction:-4},5:{henchmen:2,loyalty:-4,reaction:-3},6:{henchmen:2,loyalty:-3,reaction:-2},7:{henchmen:3,loyalty:-2,reaction:-1},8:{henchmen:3,loyalty:-1,reaction:0},9:{henchmen:4,loyalty:0,reaction:0},10:{henchmen:4,loyalty:0,reaction:0},11:{henchmen:4,loyalty:0,reaction:0},12:{henchmen:5,loyalty:0,reaction:0},13:{henchmen:5,loyalty:0,reaction:1},14:{henchmen:6,loyalty:1,reaction:2},15:{henchmen:7,loyalty:3,reaction:3},16:{henchmen:8,loyalty:4,reaction:5},17:{henchmen:10,loyalty:6,reaction:6},18:{henchmen:15,loyalty:8,reaction:7},19:{henchmen:20,loyalty:10,reaction:8}};return rows[Math.max(1,Math.min(19,score))];}
+export function levelOneSavingThrows(classIds:ClassId[],raceId:RaceId|null,constitution:number):SavingThrows|null{if(!classIds.length)return null;const groups=classIds.map(id=>classById(id).group);const saves=groups.reduce<SavingThrows>((best,group)=>{const row=LEVEL_ONE_SAVES[group];return{paralyzationPoisonDeath:Math.min(best.paralyzationPoisonDeath,row.paralyzationPoisonDeath),rodStaffWand:Math.min(best.rodStaffWand,row.rodStaffWand),petrificationPolymorph:Math.min(best.petrificationPolymorph,row.petrificationPolymorph),breathWeapon:Math.min(best.breathWeapon,row.breathWeapon),spell:Math.min(best.spell,row.spell)};},{paralyzationPoisonDeath:99,rodStaffWand:99,petrificationPolymorph:99,breathWeapon:99,spell:99});const raceBonus=racialConSaveBonus(constitution);const magicRace=raceId==="dwarf"||raceId==="gnome"||raceId==="halfling";const poisonRace=raceId==="dwarf"||raceId==="halfling";const poisonAdj=poisonAbilityAdjustment(constitution);const paladinBonus=classIds.includes("paladin")?2:0;return{paralyzationPoisonDeath:Math.max(2,saves.paralyzationPoisonDeath-(poisonRace?raceBonus:0)-poisonAdj-paladinBonus),rodStaffWand:Math.max(2,saves.rodStaffWand-(magicRace?raceBonus:0)-paladinBonus),petrificationPolymorph:Math.max(2,saves.petrificationPolymorph-paladinBonus),breathWeapon:Math.max(2,saves.breathWeapon-paladinBonus),spell:Math.max(2,saves.spell-(magicRace?raceBonus:0)-paladinBonus)};}
+export function startingGoldDice(group:ClassGroup){if(group==="Warrior")return{count:5,sides:4,multiplier:10,bonus:0};if(group==="Wizard")return{count:1,sides:4,multiplier:10,bonus:1};if(group==="Priest")return{count:3,sides:6,multiplier:10,bonus:0};return{count:2,sides:6,multiplier:10,bonus:0};}
+export function classById(id:ClassId){return CLASSES.find(i=>i.id===id)!;}export function raceById(id:RaceId){return RACES.find(i=>i.id===id)!;}
