@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import ForgeCounsel from "./forge-counsel";
+import RulesGuardian from "./rules-guardian";
 import "./globals.css";
 import "./dice.css";
 import "./derived.css";
 import "./features.css";
 import "./counsel.css";
+import "./audit-guardian.css";
 
 export const metadata: Metadata = {
   title: "Old School Character Forge",
@@ -17,6 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         {children}
         <ForgeCounsel />
+        <RulesGuardian />
       </body>
     </html>
   );
