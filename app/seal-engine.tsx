@@ -30,6 +30,7 @@ function buildRecord():Partial<CharacterRecord>{
  const encMove=num(text(".encumbrance-grid > div:nth-child(4) strong"));
  const encCategory=text(".encumbrance-title strong");
  const exceptionalStrength=exceptionalFromDom();
+ const warrior=classes.some(id=>["fighter","ranger","paladin"].includes(id));
  const record:Partial<CharacterRecord>={
   schemaVersion:1,
   sealedAt:new Date().toISOString(),
@@ -38,7 +39,7 @@ function buildRecord():Partial<CharacterRecord>{
   classes,
   alignment:text(".record-alignment"),
   abilities:scores,
-  derivedAbilities:deriveAllAbilities(scores,exceptionalStrength),
+  derivedAbilities:deriveAllAbilities(scores,exceptionalStrength,warrior),
   racialTraits:race?raceTraits(race):undefined,
   hp:num(text(".record-badges > div:nth-child(1) strong")),
   ac:num(text(".record-badges > div:nth-child(2) strong")),
