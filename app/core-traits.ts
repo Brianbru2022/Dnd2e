@@ -14,11 +14,11 @@ function asRecord(value: object): Record<string, unknown> {
   return value as Record<string, unknown>;
 }
 
-export function deriveAllAbilities(scores: AbilityScores, exceptionalStrength: number | null = null): AbilityDerivedRecord {
+export function deriveAllAbilities(scores: AbilityScores, exceptionalStrength: number | null = null, warrior = false): AbilityDerivedRecord {
   return {
     strength: asRecord(strengthDerived(scores.str, exceptionalStrength)),
     dexterity: asRecord(dexterityDerived(scores.dex)),
-    constitution: asRecord(constitutionDerived(scores.con)),
+    constitution: asRecord(constitutionDerived(scores.con, warrior)),
     intelligence: asRecord(intelligenceDerived(scores.int)),
     wisdom: asRecord(wisdomDerived(scores.wis)),
     charisma: asRecord(charismaDerived(scores.cha)),
