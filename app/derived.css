@@ -1,0 +1,78 @@
+.record-rule-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(91,72,43,.45);
+}
+
+.record-rule-section h3 {
+  margin: 0 0 9px;
+  color: #8b6630;
+  font: 700 .7rem "Cinzel", serif;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.record-rule-section h3 small {
+  display: block;
+  margin-top: 2px;
+  color: #6f624e;
+  font: 400 .67rem "EB Garamond", serif;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.derived-rule-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 12px;
+}
+
+.derived-rule-grid > div,
+.save-list > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  padding: 4px 0;
+  border-bottom: 1px dotted rgba(72,55,34,.28);
+}
+
+.derived-rule-grid span,
+.save-list span {
+  min-width: 0;
+  color: #574934;
+  font-size: .74rem;
+  line-height: 1.1;
+}
+
+.derived-rule-grid strong,
+.save-list strong {
+  flex: 0 0 auto;
+  color: #322619;
+  font: 700 .76rem "Cinzel", serif;
+}
+
+.save-list {
+  display: grid;
+  gap: 1px;
+}
+
+.saving-throw-section {
+  padding: 10px 11px 9px;
+  border: 1px solid rgba(119,86,41,.33);
+  background: rgba(120,82,35,.035);
+}
+
+@media (max-width: 1220px) {
+  .derived-rule-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .record-rule-section { margin-top: 12px; }
+  .derived-rule-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+
+@media (max-width: 430px) {
+  .derived-rule-grid { grid-template-columns: 1fr; }
+}
