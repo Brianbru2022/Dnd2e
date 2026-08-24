@@ -1,4 +1,5 @@
 import type { AbilityScores, ClassId, RaceId, SavingThrows } from "./rules";
+import type { AbilityDerivedRecord, RaceTraits } from "./core-traits";
 
 export type CharacterSex = "female" | "male";
 
@@ -35,6 +36,8 @@ export type CharacterRecord = {
   classes: ClassId[];
   alignment: string;
   abilities: AbilityScores;
+  derivedAbilities: AbilityDerivedRecord;
+  racialTraits: RaceTraits;
   hp: number;
   ac: number;
   thac0: number;
@@ -73,6 +76,8 @@ export function validateCharacterRecord(record: Partial<CharacterRecord>): Valid
   if(!record.classes?.length) errors.push("Class path is incomplete.");
   if(!record.alignment) errors.push("Alignment is incomplete.");
   if(!record.abilities || Object.values(record.abilities).some(v=>!Number.isFinite(v)||v<3)) errors.push("Ability scores are incomplete.");
+  if(!record.derivedAbilities) errors.push("Derived ability tables are incomplete.");
+  if(!record.racialTraits) errors.push("Racial characteristics are incomplete.");
   if(!Number.isFinite(record.hp) || (record.hp??0)<1) errors.push("Starting hit points are incomplete.");
   if(!record.savingThrows) errors.push("Saving throws are incomplete.");
   if(!Number.isFinite(record.gold) || (record.gold??-1)<0) errors.push("Equipment spending exceeds available gold or starting gold is incomplete.");
