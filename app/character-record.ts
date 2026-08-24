@@ -1,6 +1,7 @@
 import type { AbilityScores, ClassId, RaceId, SavingThrows } from "./rules";
 import type { AbilityDerivedRecord, RaceTraits } from "./core-traits";
 import type { ArmorRecord, GearRecord, WeaponRecord } from "./equipment-catalog";
+import type { EquipmentSystemic } from "./equipment-systemics";
 
 export type CharacterSex = "female" | "male";
 export type MagicRecord={learned:string[];memorizedWizard:string[];memorizedPriest:string[];attempts:{spell:string;roll:number;target:number;success:boolean}[]};
@@ -9,7 +10,8 @@ export type PortraitForgeRecord={appearance:Record<string,string|null>;customDes
 export type ClassProgressionSnapshot={classId:ClassId;level:number;xp:number;nextLevelXp:number|null;thac0:number;savingThrows:SavingThrows;hpProgression:string;spellSlots:number[];attacksPerRound?:string;backstabMultiplier?:number;weaponBonusSlots:number;nonweaponBonusSlots:number};
 export type ProficiencyRecord={id?:string;name:string;slots:number;ability?:string;modifier?:number;checkTarget?:number|null;crossGroup?:boolean;description?:string};
 export type ProficiencyRulesProfile={nonproficiencyPenalties:{Warrior:number;Wizard:number;Priest:number;Rogue:number};specialization:{eligibility:string;melee:unknown;bow:unknown;crossbow:unknown};catalogueVersion:string};
-export type EquipmentRulesProfile={catalogueVersion:string;coinageVersion:string;weapons:WeaponRecord[];armour:ArmorRecord|null;gear:GearRecord[]};
+export type SealedGearRecord=GearRecord&{systemic?:EquipmentSystemic};
+export type EquipmentRulesProfile={catalogueVersion:string;coinageVersion:string;weapons:WeaponRecord[];armour:ArmorRecord|null;gear:SealedGearRecord[]};
 
 export type CharacterRecord={
  schemaVersion:1;sealedAt:string;identity:{name:string;sex:CharacterSex|null};race:RaceId;classes:ClassId[];classProgression:ClassProgressionSnapshot[];alignment:string;abilities:AbilityScores;derivedAbilities:AbilityDerivedRecord;racialTraits:RaceTraits;hp:number;ac:number;thac0:number;savingThrows:SavingThrows;gold:number;
