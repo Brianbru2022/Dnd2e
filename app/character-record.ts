@@ -28,12 +28,28 @@ export type PortraitForgeRecord = {
   lastResponse?: unknown;
 };
 
+export type ClassProgressionSnapshot = {
+  classId: ClassId;
+  level: number;
+  xp: number;
+  nextLevelXp: number | null;
+  thac0: number;
+  savingThrows: SavingThrows;
+  hpProgression: string;
+  spellSlots: number[];
+  attacksPerRound?: string;
+  backstabMultiplier?: number;
+  weaponBonusSlots: number;
+  nonweaponBonusSlots: number;
+};
+
 export type CharacterRecord = {
   schemaVersion: 1;
   sealedAt: string;
   identity: { name:string; sex:CharacterSex|null };
   race: RaceId;
   classes: ClassId[];
+  classProgression: ClassProgressionSnapshot[];
   alignment: string;
   abilities: AbilityScores;
   derivedAbilities: AbilityDerivedRecord;
@@ -74,6 +90,7 @@ export function validateCharacterRecord(record: Partial<CharacterRecord>): Valid
   if(!record.identity?.sex) errors.push("Choose Female or Male for the character identity.");
   if(!record.race) errors.push("Ancestry is incomplete.");
   if(!record.classes?.length) errors.push("Class path is incomplete.");
+  if(!record.classProgression?.length) errors.push("Class progression data is incomplete.");
   if(!record.alignment) errors.push("Alignment is incomplete.");
   if(!record.abilities || Object.values(record.abilities).some(v=>!Number.isFinite(v)||v<3)) errors.push("Ability scores are incomplete.");
   if(!record.derivedAbilities) errors.push("Derived ability tables are incomplete.");
