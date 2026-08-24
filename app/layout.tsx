@@ -7,6 +7,7 @@ import EncumbranceEngine from "./encumbrance-engine";
 import MagicEngine from "./magic-engine";
 import SealEngine from "./seal-engine";
 import FinalDetails from "./final-details";
+import PortraitForge from "./portrait-forge";
 import "./globals.css";
 import "./dice.css";
 import "./derived.css";
@@ -19,6 +20,7 @@ import "./encumbrance-engine.css";
 import "./magic-engine.css";
 import "./seal-engine.css";
 import "./final-details.css";
+import "./portrait-forge.css";
 
 export const metadata: Metadata = {
   title: "Old School Character Forge",
@@ -37,6 +39,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <EncumbranceEngine />
         <MagicEngine />
         <FinalDetails />
+        <PortraitForge />
         <SealEngine />
       </body>
     </html>
