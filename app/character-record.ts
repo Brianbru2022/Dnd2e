@@ -17,6 +17,16 @@ export type CharacterFinalDetails = {
   portrait: string | null;
 };
 
+export type PortraitForgeRecord = {
+  appearance: Record<string,string|null>;
+  customDescription: string;
+  generatedPrompt: string;
+  endpoint: string;
+  workflowEndpoint: string;
+  status?: string;
+  lastResponse?: unknown;
+};
+
 export type CharacterRecord = {
   schemaVersion: 1;
   sealedAt: string;
@@ -37,6 +47,7 @@ export type CharacterRecord = {
   };
   magic: MagicRecord;
   finalDetails: CharacterFinalDetails;
+  portraitForge?: PortraitForgeRecord;
   equipment: {
     armour: string | null;
     shield: boolean;
@@ -76,6 +87,6 @@ export function validateCharacterRecord(record: Partial<CharacterRecord>): Valid
     const total=Object.values(record.classChoices?.bardSkills??{}).reduce((a,b)=>a+(Number(b)||0),0);
     if(total!==20) errors.push("Allocate all 20 Bard rogue-skill points.");
   }
-  if(!record.finalDetails?.portrait) errors.push("Choose a portrait presentation.");
+  if(!record.finalDetails?.portrait && !record.portraitForge?.generatedPrompt) errors.push("Choose a portrait presentation or prepare a Portrait Forge prompt.");
   return {valid:errors.length===0,errors};
 }
