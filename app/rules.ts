@@ -8,6 +8,14 @@ export type WeaponId = "longsword" | "shortsword" | "battleaxe" | "warhammer" | 
 export type ArmorId = "none" | "leather" | "studded" | "scale" | "chain" | "splint" | "plate";
 export type ShieldId = "none" | "shield";
 
+export type SavingThrows = {
+  paralyzationPoisonDeath: number;
+  rodStaffWand: number;
+  petrificationPolymorph: number;
+  breathWeapon: number;
+  spell: number;
+};
+
 export const ABILITIES: { id: AbilityKey; name: string; short: string }[] = [
   { id: "str", name: "Strength", short: "STR" },
   { id: "dex", name: "Dexterity", short: "DEX" },
@@ -118,6 +126,31 @@ export const NON_WEAPON_PROFICIENCIES = ["Ancient History","Animal Handling","Di
 
 export const EMPTY_SCORES: AbilityScores = { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 };
 
+const LEVEL_ONE_SAVES: Record<ClassGroup, SavingThrows> = {
+  Warrior: { paralyzationPoisonDeath: 14, rodStaffWand: 16, petrificationPolymorph: 15, breathWeapon: 17, spell: 17 },
+  Wizard: { paralyzationPoisonDeath: 14, rodStaffWand: 11, petrificationPolymorph: 13, breathWeapon: 15, spell: 12 },
+  Priest: { paralyzationPoisonDeath: 10, rodStaffWand: 14, petrificationPolymorph: 13, breathWeapon: 16, spell: 15 },
+  Rogue: { paralyzationPoisonDeath: 13, rodStaffWand: 14, petrificationPolymorph: 12, breathWeapon: 16, spell: 15 },
+};
+
+function racialConSaveBonus(score: number) {
+  if (score <= 3) return 0;
+  if (score <= 6) return 1;
+  if (score <= 10) return 2;
+  if (score <= 13) return 3;
+  if (score <= 17) return 4;
+  return 5;
+}
+
+function poisonAbilityAdjustment(score: number) {
+  if (score <= 1) return -2;
+  if (score === 2) return -1;
+  if (score >= 23) return 3;
+  if (score >= 21) return 2;
+  if (score >= 19) return 1;
+  return 0;
+}
+
 export function applyRaceAdjustments(scores: AbilityScores, raceId: RaceId): AbilityScores {
   const race = RACES.find((item) => item.id === raceId);
   const next = { ...scores };
@@ -154,6 +187,90 @@ export function dexterityAcAdjustment(score: number) {
   if (score === 16) return -2;
   if (score === 17) return -3;
   return -4;
+}
+
+export function strengthDerived(score: number, exceptional: number | null = null) {
+  if (score <= 2) return score === 1 ? { hit: -5, damage: -4, weight: 1, press: 3, doors: "1", bend: "0%" } : { hit: -3, damage: -2, weight: 1, press: 5, doors: "1", bend: "0%" };
+  if (score === 3) return { hit: -3, damage: -1, weight: 5, press: 10, doors: "2", bend: "0%" };
+  if (score <= 5) return { hit: -2, damage: -1, weight: 10, press: 25, doors: "3", bend: "0%" };
+  if (score <= 7) return { hit: -1, damage: 0, weight: 20, press: 55, doors: "4", bend: "0%" };
+  if (score <= 9) return { hit: 0, damage: 0, weight: 35, press: 90, doors: "5", bend: "1%" };
+  if (score <= 11) return { hit: 0, damage: 0, weight: 40, press: 115, doors: "6", bend: "2%" };
+  if (score <= 13) return { hit: 0, damage: 0, weight: 45, press: 140, doors: "7", bend: "4%" };
+  if (score <= 15) return { hit: 0, damage: 0, weight: 55, press: 170, doors: "8", bend: "7%" };
+  if (score === 16) return { hit: 0, damage: 1, weight: 70, press: 195, doors: "9", bend: "10%" };
+  if (score === 17) return { hit: 1, damage: 1, weight: 85, press: 220, doors: "10", bend: "13%" };
+  if (score === 18 && exceptional !== null) {
+    if (exceptional <= 50) return { hit: 1, damage: 3, weight: 135, press: 280, doors: "12", bend: "20%" };
+    if (exceptional <= 75) return { hit: 2, damage: 3, weight: 160, press: 305, doors: "13", bend: "25%" };
+    if (exceptional <= 90) return { hit: 2, damage: 4, weight: 185, press: 330, doors: "14", bend: "30%" };
+    if (exceptional <= 99) return { hit: 2, damage: 5, weight: 235, press: 380, doors: "15 (3)", bend: "35%" };
+    return { hit: 3, damage: 6, weight: 335, press: 480, doors: "16 (6)", bend: "40%" };
+  }
+  if (score === 18) return { hit: 1, damage: 2, weight: 110, press: 255, doors: "11", bend: "16%" };
+  return { hit: 3, damage: 7, weight: 485, press: 640, doors: "16 (8)", bend: "50%" };
+}
+
+export function dexterityDerived(score: number) {
+  const reaction = score <= 1 ? -6 : score === 2 ? -4 : score === 3 ? -3 : score === 4 ? -2 : score === 5 ? -1 : score <= 15 ? 0 : score === 16 ? 1 : score <= 18 ? 2 : 3;
+  const missile = reaction;
+  return { reaction, missile, defense: dexterityAcAdjustment(score) };
+}
+
+export function constitutionDerived(score: number, warrior: boolean) {
+  const shocks = [0,25,30,35,40,45,50,55,60,65,70,75,80,85,88,90,95,97,99,99];
+  const resurrection = [0,30,35,40,45,50,55,60,65,70,75,80,85,90,92,94,96,98,100,100];
+  const index = Math.max(1, Math.min(19, score));
+  return { hp: constitutionHpBonus(score, warrior), systemShock: shocks[index], resurrection: resurrection[index], poison: poisonAbilityAdjustment(score) };
+}
+
+export function intelligenceDerived(score: number) {
+  const rows: Record<number, { languages: number; maxSpell: string; learn: string; maxSpells: string }> = {
+    9:{languages:2,maxSpell:"4th",learn:"35%",maxSpells:"6"},10:{languages:2,maxSpell:"5th",learn:"40%",maxSpells:"7"},11:{languages:2,maxSpell:"5th",learn:"45%",maxSpells:"7"},12:{languages:3,maxSpell:"6th",learn:"50%",maxSpells:"7"},13:{languages:3,maxSpell:"6th",learn:"55%",maxSpells:"9"},14:{languages:4,maxSpell:"7th",learn:"60%",maxSpells:"9"},15:{languages:4,maxSpell:"7th",learn:"65%",maxSpells:"11"},16:{languages:5,maxSpell:"8th",learn:"70%",maxSpells:"11"},17:{languages:6,maxSpell:"8th",learn:"75%",maxSpells:"14"},18:{languages:7,maxSpell:"9th",learn:"85%",maxSpells:"18"},19:{languages:8,maxSpell:"9th",learn:"95%",maxSpells:"All"},
+  };
+  if (score < 9) return { languages: score <= 1 ? 0 : 1, maxSpell: "—", learn: "—", maxSpells: "—" };
+  return rows[Math.min(19, score)] ?? rows[19];
+}
+
+export function wisdomDerived(score: number) {
+  const magicDefense = score <= 1 ? -6 : score === 2 ? -4 : score === 3 ? -3 : score === 4 ? -2 : score <= 7 ? -1 : score <= 14 ? 0 : score === 15 ? 1 : score === 16 ? 2 : score === 17 ? 3 : score === 18 ? 4 : 4;
+  const failure = score <= 1 ? 80 : score === 2 ? 60 : score === 3 ? 50 : score === 4 ? 45 : score === 5 ? 40 : score === 6 ? 35 : score === 7 ? 30 : score === 8 ? 25 : score === 9 ? 20 : score === 10 ? 15 : score === 11 ? 10 : score === 12 ? 5 : 0;
+  const bonusSpells = score < 13 ? "—" : score === 13 ? "1×1st" : score === 14 ? "2×1st" : score === 15 ? "2×1st, 1×2nd" : score === 16 ? "2×1st, 2×2nd" : score === 17 ? "2×1st, 2×2nd, 1×3rd" : "2×1st, 2×2nd, 1×3rd, 1×4th";
+  return { magicDefense, spellFailure: `${failure}%`, bonusSpells };
+}
+
+export function charismaDerived(score: number) {
+  const rows: Record<number, { henchmen: number; loyalty: number; reaction: number }> = {
+    1:{henchmen:0,loyalty:-8,reaction:-7},2:{henchmen:1,loyalty:-7,reaction:-6},3:{henchmen:1,loyalty:-6,reaction:-5},4:{henchmen:1,loyalty:-5,reaction:-4},5:{henchmen:2,loyalty:-4,reaction:-3},6:{henchmen:2,loyalty:-3,reaction:-2},7:{henchmen:3,loyalty:-2,reaction:-1},8:{henchmen:3,loyalty:-1,reaction:0},9:{henchmen:4,loyalty:0,reaction:0},10:{henchmen:4,loyalty:0,reaction:0},11:{henchmen:4,loyalty:0,reaction:0},12:{henchmen:5,loyalty:0,reaction:0},13:{henchmen:5,loyalty:0,reaction:1},14:{henchmen:6,loyalty:1,reaction:2},15:{henchmen:7,loyalty:3,reaction:3},16:{henchmen:8,loyalty:4,reaction:5},17:{henchmen:10,loyalty:6,reaction:6},18:{henchmen:15,loyalty:8,reaction:7},19:{henchmen:20,loyalty:10,reaction:8},
+  };
+  return rows[Math.max(1, Math.min(19, score))];
+}
+
+export function levelOneSavingThrows(classIds: ClassId[], raceId: RaceId | null, constitution: number): SavingThrows | null {
+  if (!classIds.length) return null;
+  const groups = classIds.map((id) => classById(id).group);
+  const saves = groups.reduce<SavingThrows>((best, group) => {
+    const row = LEVEL_ONE_SAVES[group];
+    return {
+      paralyzationPoisonDeath: Math.min(best.paralyzationPoisonDeath, row.paralyzationPoisonDeath),
+      rodStaffWand: Math.min(best.rodStaffWand, row.rodStaffWand),
+      petrificationPolymorph: Math.min(best.petrificationPolymorph, row.petrificationPolymorph),
+      breathWeapon: Math.min(best.breathWeapon, row.breathWeapon),
+      spell: Math.min(best.spell, row.spell),
+    };
+  }, { paralyzationPoisonDeath: 99, rodStaffWand: 99, petrificationPolymorph: 99, breathWeapon: 99, spell: 99 });
+
+  const raceBonus = racialConSaveBonus(constitution);
+  const magicRace = raceId === "dwarf" || raceId === "gnome" || raceId === "halfling";
+  const poisonRace = raceId === "dwarf" || raceId === "halfling";
+  const poisonAdj = poisonAbilityAdjustment(constitution);
+  return {
+    paralyzationPoisonDeath: Math.max(2, saves.paralyzationPoisonDeath - (poisonRace ? raceBonus : 0) - poisonAdj),
+    rodStaffWand: Math.max(2, saves.rodStaffWand - (magicRace ? raceBonus : 0)),
+    petrificationPolymorph: saves.petrificationPolymorph,
+    breathWeapon: saves.breathWeapon,
+    spell: Math.max(2, saves.spell - (magicRace ? raceBonus : 0)),
+  };
 }
 
 export function startingGoldDice(group: ClassGroup) {
