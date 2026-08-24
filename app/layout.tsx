@@ -4,6 +4,7 @@ import RulesGuardian from "./rules-guardian";
 import AuditedClassChoices from "./audited-class-choices";
 import ProficiencyEngine from "./proficiency-engine";
 import EncumbranceEngine from "./encumbrance-engine";
+import MagicEngine from "./magic-engine";
 import "./globals.css";
 import "./dice.css";
 import "./derived.css";
@@ -13,6 +14,7 @@ import "./audit-guardian.css";
 import "./audited-class-choices.css";
 import "./proficiency-engine.css";
 import "./encumbrance-engine.css";
+import "./magic-engine.css";
 
 export const metadata: Metadata = {
   title: "Old School Character Forge",
@@ -29,6 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <AuditedClassChoices />
         <ProficiencyEngine />
         <EncumbranceEngine />
+        <MagicEngine />
       </body>
     </html>
   );
