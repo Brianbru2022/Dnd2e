@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ABILITIES, CLASSES, RACES, type AbilityKey, type AbilityScores, type ClassId, type RaceId } from "./rules";
-import type { CharacterFinalDetails, CharacterRecord, CharacterSex, MagicRecord } from "./character-record";
+import type { CharacterFinalDetails, CharacterRecord, CharacterSex, MagicRecord, PortraitForgeRecord } from "./character-record";
 import { validateCharacterRecord } from "./character-record";
 
 function num(text:string|undefined|null){const n=Number.parseFloat((text??"").replace(/[^0-9.-]/g,""));return Number.isFinite(n)?n:0;}
@@ -18,6 +18,7 @@ function buildRecord():Partial<CharacterRecord>{
  const race=readRace(); const classes=readClasses(); const scores=readScores();
  const magic=safeJson<MagicRecord>("forge-magic-ledger",{learned:[],memorizedWizard:[],memorizedPriest:[],attempts:[]});
  const finalDetails=safeJson<CharacterFinalDetails>("forge-final-details",{languages:[],age:null,heightIn:null,weightLb:null,portrait:null});
+ const portraitForge=safeJson<PortraitForgeRecord|undefined>("forge-portrait-forge",undefined);
  const sex=(localStorage.getItem("character-forge-sex") as CharacterSex|null);
  const bard=safeJson<Record<string,number>>("forge-bard-skills",{});
  const ranger=localStorage.getItem("forge-ranger-species-enemy")??undefined;
@@ -49,6 +50,7 @@ function buildRecord():Partial<CharacterRecord>{
   classChoices:{rangerSpeciesEnemy:ranger,bardSkills:bard},
   magic,
   finalDetails,
+  portraitForge,
   equipment:{
    armour:text(".record-details > div:first-child strong")||null,
    shield:text(".record-details > div:first-child strong").includes("shield"),
@@ -56,14 +58,14 @@ function buildRecord():Partial<CharacterRecord>{
    gear:readSelectedButtons(".equipment-choice-grid.gear button.selected"),
   },
   encumbrance:{carriedLb:encCarried,allowanceLb:encAllowance,category:encCategory,movement:encMove},
-  rollHistory:magic.attempts,
+  rollHistory:[...magic.attempts,{appearance:portraitForge?.appearance??{},portraitPrompt:portraitForge?.generatedPrompt??""}],
  };
  return record;
 }
 
 export default function SealEngine(){
  const [version,setVersion]=useState(0); const [errors,setErrors]=useState<string[]>([]); const [sealed,setSealed]=useState(false);
- useEffect(()=>{const obs=new MutationObserver(()=>setVersion(v=>v+1));obs.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true});const handler=()=>setVersion(v=>v+1);window.addEventListener("forge-magic-updated",handler);return()=>{obs.disconnect();window.removeEventListener("forge-magic-updated",handler);};},[]);
+ useEffect(()=>{const obs=new MutationObserver(()=>setVersion(v=>v+1));obs.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true});const handler=()=>setVersion(v=>v+1);window.addEventListener("forge-magic-updated",handler);window.addEventListener("forge-portrait-requested",handler);return()=>{obs.disconnect();window.removeEventListener("forge-magic-updated",handler);window.removeEventListener("forge-portrait-requested",handler);};},[]);
  const button=useMemo(()=>typeof document!=="undefined"?document.querySelector(".seal-button") as HTMLButtonElement|null:null,[version]);
  useEffect(()=>{if(!button)return;const onClick=(e:Event)=>{e.preventDefault();e.stopImmediatePropagation();const candidate=buildRecord();const result=validateCharacterRecord(candidate);setErrors(result.errors);if(!result.valid){setSealed(false);button.classList.remove("sealed");button.textContent="Resolve Character Errors";return;}const finalRecord={...candidate,sealedAt:new Date().toISOString()} as CharacterRecord;localStorage.setItem("forge-character-record",JSON.stringify(finalRecord));setSealed(true);button.classList.add("sealed");button.textContent="Character Sealed";window.dispatchEvent(new CustomEvent("forge-character-sealed",{detail:finalRecord}));};button.addEventListener("click",onClick,true);return()=>button.removeEventListener("click",onClick,true);},[button]);
  if(!errors.length&&!sealed)return null;
