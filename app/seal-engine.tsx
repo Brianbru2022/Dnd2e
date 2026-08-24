@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { ABILITIES, CLASSES, RACES, type AbilityKey, type AbilityScores, type ClassId, type RaceId } from "./rules";
-import type { CharacterRecord, CharacterSex, MagicRecord } from "./character-record";
+import type { CharacterFinalDetails, CharacterRecord, CharacterSex, MagicRecord } from "./character-record";
 import { validateCharacterRecord } from "./character-record";
 
 function num(text:string|undefined|null){const n=Number.parseFloat((text??"").replace(/[^0-9.-]/g,""));return Number.isFinite(n)?n:0;}
@@ -17,6 +17,7 @@ function safeJson<T>(key:string,fallback:T):T{try{return JSON.parse(localStorage
 function buildRecord():Partial<CharacterRecord>{
  const race=readRace(); const classes=readClasses(); const scores=readScores();
  const magic=safeJson<MagicRecord>("forge-magic-ledger",{learned:[],memorizedWizard:[],memorizedPriest:[],attempts:[]});
+ const finalDetails=safeJson<CharacterFinalDetails>("forge-final-details",{languages:[],age:null,heightIn:null,weightLb:null,portrait:null});
  const sex=(localStorage.getItem("character-forge-sex") as CharacterSex|null);
  const bard=safeJson<Record<string,number>>("forge-bard-skills",{});
  const ranger=localStorage.getItem("forge-ranger-species-enemy")??undefined;
@@ -47,6 +48,7 @@ function buildRecord():Partial<CharacterRecord>{
   proficiencies:profs,
   classChoices:{rangerSpeciesEnemy:ranger,bardSkills:bard},
   magic,
+  finalDetails,
   equipment:{
    armour:text(".record-details > div:first-child strong")||null,
    shield:text(".record-details > div:first-child strong").includes("shield"),
