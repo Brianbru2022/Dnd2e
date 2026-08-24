@@ -9,6 +9,14 @@ export type MagicRecord = {
   attempts: { spell:string; roll:number; target:number; success:boolean }[];
 };
 
+export type CharacterFinalDetails = {
+  languages: string[];
+  age: number | null;
+  heightIn: number | null;
+  weightLb: number | null;
+  portrait: string | null;
+};
+
 export type CharacterRecord = {
   schemaVersion: 1;
   sealedAt: string;
@@ -28,6 +36,7 @@ export type CharacterRecord = {
     bardSkills?: Record<string,number>;
   };
   magic: MagicRecord;
+  finalDetails: CharacterFinalDetails;
   equipment: {
     armour: string | null;
     shield: boolean;
@@ -67,5 +76,6 @@ export function validateCharacterRecord(record: Partial<CharacterRecord>): Valid
     const total=Object.values(record.classChoices?.bardSkills??{}).reduce((a,b)=>a+(Number(b)||0),0);
     if(total!==20) errors.push("Allocate all 20 Bard rogue-skill points.");
   }
+  if(!record.finalDetails?.portrait) errors.push("Choose a portrait presentation.");
   return {valid:errors.length===0,errors};
 }
