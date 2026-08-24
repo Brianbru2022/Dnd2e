@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ABILITIES, CLASSES, RACES, type AbilityKey, type AbilityScores, type ClassId, type RaceId } from "./rules";
 import type { CharacterFinalDetails, CharacterRecord, CharacterSex, MagicRecord, PortraitForgeRecord } from "./character-record";
 import { validateCharacterRecord } from "./character-record";
+import { deriveAllAbilities, raceTraits } from "./core-traits";
 
 function num(text:string|undefined|null){const n=Number.parseFloat((text??"").replace(/[^0-9.-]/g,""));return Number.isFinite(n)?n:0;}
 function text(selector:string){return document.querySelector(selector)?.textContent?.trim()??"";}
@@ -13,6 +14,7 @@ function readScores():AbilityScores{const out={} as AbilityScores;document.query
 function readSave(label:string){const rows=Array.from(document.querySelectorAll(".save-grid > div"));const row=rows.find(r=>r.querySelector("span")?.textContent?.includes(label));return Number.parseInt(row?.querySelector("strong")?.textContent??"0",10)||0;}
 function readSelectedButtons(selector:string){return Array.from(document.querySelectorAll(selector)).map(b=>b.querySelector("strong")?.textContent?.trim()??b.textContent?.trim()??"").filter(Boolean);}
 function safeJson<T>(key:string,fallback:T):T{try{return JSON.parse(localStorage.getItem(key)??"") as T}catch{return fallback;}}
+function exceptionalFromDom(){const t=text(".record-subtitle");const m=t.match(/18\/(\d{1,2}|00)/);if(!m)return null;return m[1]==="00"?100:Number.parseInt(m[1],10);}
 
 function buildRecord():Partial<CharacterRecord>{
  const race=readRace(); const classes=readClasses(); const scores=readScores();
@@ -27,6 +29,7 @@ function buildRecord():Partial<CharacterRecord>{
  const encAllowance=num(text(".encumbrance-grid > div:nth-child(2) strong"));
  const encMove=num(text(".encumbrance-grid > div:nth-child(4) strong"));
  const encCategory=text(".encumbrance-title strong");
+ const exceptionalStrength=exceptionalFromDom();
  const record:Partial<CharacterRecord>={
   schemaVersion:1,
   sealedAt:new Date().toISOString(),
@@ -35,6 +38,8 @@ function buildRecord():Partial<CharacterRecord>{
   classes,
   alignment:text(".record-alignment"),
   abilities:scores,
+  derivedAbilities:deriveAllAbilities(scores,exceptionalStrength),
+  racialTraits:race?raceTraits(race):undefined,
   hp:num(text(".record-badges > div:nth-child(1) strong")),
   ac:num(text(".record-badges > div:nth-child(2) strong")),
   thac0:num(text(".record-badges > div:nth-child(3) strong")),
